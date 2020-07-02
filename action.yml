@@ -12,6 +12,9 @@ inputs:
   lambda_function_name:
     description: The Lambda function name. Check the AWS docs/readme for examples.
     required: true
+  lambda_region:
+    description: The Lambda region. Check the AWS docs/readme for examples.
+    required: true
 runs:
   using: 'docker'
   image: 'Dockerfile'
