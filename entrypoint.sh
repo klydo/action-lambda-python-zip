@@ -35,7 +35,7 @@ publish_dependencies_as_layer(){
 	echo "LAYER_NAME: $LAYER_NAME"
 	local result=$(aws lambda publish-layer-version --layer-name "${LAYER_NAME}" --zip-file fileb://${FILE_NAME})
 	LAYER_VERSION=$(jq '.Version' <<< "$result")
-	ALL_LAMBDA_LAYERS="${ALL_LAMBDA_LAYERS} ${LAYER_NAME}:${LAYER_VERSION}"
+	ALL_LAMBDA_LAYERS="${ALL_LAMBDA_LAYERS} \ ${LAYER_NAME}:${LAYER_VERSION}"
 	echo $ALL_LAMBDA_LAYERS
 	rm ${FILE_NAME}
 }
