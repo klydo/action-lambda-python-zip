@@ -49,7 +49,6 @@ publish_function_code(){
 
 update_function_layers(){
 	echo "Using the layer in the function..."
-	echo aws lambda update-function-configuration --function-name "${INPUT_LAMBDA_FUNCTION_NAME}" --layers ${ALL_LAMBDA_LAYERS}
 	aws lambda update-function-configuration --function-name "${INPUT_LAMBDA_FUNCTION_NAME}" --layers ${ALL_LAMBDA_LAYERS}
 }
 
