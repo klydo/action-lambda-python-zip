@@ -11,12 +11,30 @@ install_zip_dependencies(){
 	mkdir python
 	pip install --target=python -r "${INPUT_REQUIREMENTS_TXT}"
 	zip -r dependencies.zip ./python
+	zipsplit -n 50000000 dependencies.zip
+}
+
+process_dependencies() {
+	FILES=dependencies*.zip
+	for f in $FILES
+	do
+		publish_dependencies_as_layer $f
+	done
+
 }
 
 publish_dependencies_as_layer(){
-	echo "Publishing dependencies as a layer..."
-	local result=$(aws lambda publish-layer-version --layer-name "${INPUT_LAMBDA_LAYER_ARN}" --zip-file fileb://dependencies.zip)
+    echo ""
+	FILE_NAME=$1
+	echo "Publishing $FILE_NAME as a layer..."
+	FILE_NUMBER=${FILE_NAME//[^0-9]/}
+	echo "FILE_NUMBER: $FILE_NUMBER"
+	LAYER_NAME="${INPUT_LAMBDA_LAYER_ARN}${FILE_NUMBER}"
+	echo "LAYER_NAME: $LAYER_NAME"
+	local result=$(aws lambda publish-layer-version --layer-name "${LAYER_NAME}" --zip-file fileb://${FILE_NAME})
 	LAYER_VERSION=$(jq '.Version' <<< "$result")
+	ALL_LAMBDA_LAYERS="${ALL_LAMBDA_LAYERS} ${LAYER_NAME}:${LAYER_VERSION}"
+	echo $ALL_LAMBDA_LAYERS
 	rm -rf python
 	rm dependencies.zip
 }
@@ -29,13 +47,13 @@ publish_function_code(){
 
 update_function_layers(){
 	echo "Using the layer in the function..."
-	aws lambda update-function-configuration --function-name "${INPUT_LAMBDA_FUNCTION_NAME}" --layers "${INPUT_LAMBDA_LAYER_ARN}:${LAYER_VERSION}"
+	aws lambda update-function-configuration --function-name "${INPUT_LAMBDA_FUNCTION_NAME}" --layers "${ALL_LAMBDA_LAYERS}"
 }
 
 deploy_lambda_function(){
     configure_aws_credentials
 	install_zip_dependencies
-	publish_dependencies_as_layer
+	process_dependencies
 	publish_function_code
 	update_function_layers
 }
