@@ -35,7 +35,7 @@ publish_dependencies_as_layer(){
 	echo "LAYER_NAME: $LAYER_NAME"
 	local result=$(aws lambda publish-layer-version --layer-name "${LAYER_NAME}" --zip-file fileb://${FILE_NAME})
 	LAYER_VERSION=$(jq '.Version' <<< "$result")
-	ALL_LAMBDA_LAYERS="${ALL_LAMBDA_LAYERS} \ ${LAYER_NAME}:${LAYER_VERSION}"
+	ALL_LAMBDA_LAYERS="${ALL_LAMBDA_LAYERS} \"${LAYER_NAME}:${LAYER_VERSION}\""
 	echo $ALL_LAMBDA_LAYERS
 	rm ${FILE_NAME}
 }
@@ -48,7 +48,7 @@ publish_function_code(){
 
 update_function_layers(){
 	echo "Using the layer in the function..."
-	aws lambda update-function-configuration --function-name "${INPUT_LAMBDA_FUNCTION_NAME}" --layers "${ALL_LAMBDA_LAYERS}"
+	aws lambda update-function-configuration --function-name "${INPUT_LAMBDA_FUNCTION_NAME}" --layers ${ALL_LAMBDA_LAYERS}
 }
 
 deploy_lambda_function(){
