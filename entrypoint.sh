@@ -15,7 +15,7 @@ install_zip_dependencies(){
 }
 
 process_dependencies() {
-	FILES=dependencies*.zip
+	FILES=depende*.zip
 	for f in $FILES
 	do
 		publish_dependencies_as_layer $f
