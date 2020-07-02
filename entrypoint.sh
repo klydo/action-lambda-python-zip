@@ -12,6 +12,7 @@ install_zip_dependencies(){
 	pip install --target=python -r "${INPUT_REQUIREMENTS_TXT}"
 	zip -r dependencies.zip ./python
 	zipsplit -n 50000000 dependencies.zip
+	rm dependencies.zip
 }
 
 process_dependencies() {
@@ -20,6 +21,7 @@ process_dependencies() {
 	do
 		publish_dependencies_as_layer $f
 	done
+	rm -rf python
 
 }
 
@@ -35,8 +37,7 @@ publish_dependencies_as_layer(){
 	LAYER_VERSION=$(jq '.Version' <<< "$result")
 	ALL_LAMBDA_LAYERS="${ALL_LAMBDA_LAYERS} ${LAYER_NAME}:${LAYER_VERSION}"
 	echo $ALL_LAMBDA_LAYERS
-	rm -rf python
-	rm dependencies.zip
+	rm ${FILE_NAME}
 }
 
 publish_function_code(){
