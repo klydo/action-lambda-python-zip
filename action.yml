@@ -15,6 +15,10 @@ inputs:
   lambda_region:
     description: The Lambda region. Check the AWS docs/readme for examples.
     required: true
+  exclude_botocore:
+    description: 'Set to "true" to exclude botocore to reduce dependencies layer size. NOTE: This is not recommended https://aws.amazon.com/blogs/compute/upcoming-changes-to-the-python-sdk-in-aws-lambda/'
+    required: true
+    default: 'false'
 runs:
   using: 'docker'
   image: 'Dockerfile'
@@ -23,6 +27,7 @@ runs:
     - ${{ inputs.lambda_layer_arn }}
     - ${{ inputs.lambda_function_name }}
     - ${{ inputs.lambda_region }}
+    - ${{ inputs.exclude_botocore }}
 branding:
   icon: 'cloud-lightning'
   color: 'white'
