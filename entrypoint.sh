@@ -43,6 +43,7 @@ install_zip_dependencies(){
 
 process_dependencies() {
 	echo "${LAMBDA_FUNCTION_NAME} process_dependencies..."
+    ALL_LAMBDA_LAYERS=""
 	FILES=depende*.zip
 	for f in $FILES
 	do
