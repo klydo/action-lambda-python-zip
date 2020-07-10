@@ -15,7 +15,7 @@ inputs:
     description: The AWS region
     required: true
     default: 'eu-west-1'
-  lambda_ignore_path:
+  lambda_ignore_file:
     description: Path to a file that contains patterns to not upload to lambda
     required: false
   exclude_botocore:
@@ -30,7 +30,7 @@ runs:
     - ${{ inputs.lambda_function_suffix }}
     - ${{ inputs.lambda_configs_path }}
     - ${{ inputs.lambda_region }}
-    - ${{ inputs.lambda_ignore_path }}
+    - ${{ inputs.lambda_ignore_file }}
     - ${{ inputs.exclude_botocore }}
 branding:
   icon: 'cloud-lightning'
