@@ -135,7 +135,7 @@ process_lambda_config(){
 
 }
 
-get_function_configs(){
+process_function_configs(){
 	FUNCTION_DIRS=${INPUT_LAMBDA_CONFIGS_PATH}*/
 	for f in $FUNCTION_DIRS
 	do
@@ -143,12 +143,24 @@ get_function_configs(){
 	done
 }
 
+zip_code(){
+    if [ -z "${INPUT_LAMBDA_IGNORE_FILE}" ]
+    then
+    	zip -r code.zip . -x \*.*/\*
+    else
+    	zip -r code.zip . -x@${INPUT_LAMBDA_IGNORE_FILE}
+    fi
+}
+
+clean_up(){
+    rm code.zip
+}
 
 deploy_lambda_function(){
     configure_aws_credentials
-	zip -r code.zip . -x \*.*/\*
-    get_function_configs
-    rm code.zip
+    zip_code
+    process_function_configs
+    clean_up
 }
 
 deploy_lambda_function
