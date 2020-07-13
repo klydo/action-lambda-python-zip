@@ -1,4 +1,5 @@
 #!/bin/bash
+LAMBDA_URL="https://${INPUT_LAMBDA_REGION}.console.aws.amazon.com/lambda/home?region=${INPUT_LAMBDA_REGION}#/functions/"
 
 parse_yaml(){
    local prefix=$2
@@ -112,7 +113,9 @@ process_lambda_config(){
     # echo $entrypoint
     generate_function_name $entrypoint
     echo "Function: ${LAMBDA_FUNCTION_NAME}"
-    OUTPUT_FUNCTIONS="${OUTPUT_FUNCTIONS}${LAMBDA_FUNCTION_NAME}, "
+
+    # add to our output variable
+    OUTPUT_FUNCTIONS="${OUTPUT_FUNCTIONS}${LAMBDA_URL}${LAMBDA_FUNCTION_NAME}, "
     
     # temporarily change working dir
     pushd $1
