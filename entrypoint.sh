@@ -112,6 +112,7 @@ process_lambda_config(){
     # echo $entrypoint
     generate_function_name $entrypoint
     echo "Function: ${LAMBDA_FUNCTION_NAME}"
+    OUTPUT_FUNCTIONS="${OUTPUT_FUNCTIONS}${LAMBDA_FUNCTION_NAME}, "
     
     # temporarily change working dir
     pushd $1
@@ -159,10 +160,12 @@ clean_up(){
 }
 
 deploy_lambda_function(){
+    OUTPUT_FUNCTIONS=""
     configure_aws_credentials
     zip_code
     process_function_configs
     clean_up
+    echo "::set-output name=all_functions::$OUTPUT_FUNCTIONS"
 }
 
 deploy_lambda_function
