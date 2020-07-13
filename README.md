@@ -26,6 +26,10 @@ Storing credentials as secret is strongly recommended.
     The suffix of the lambda function, can specify env here e.g. `dev`.
 - `lambda_configs_path`
     The path to the lambda configurations, e.g. `aws_lambda/functions/`
+    
+### Output
+- `all_functions`
+    String containing all lambda function urls that were created
 
 ### Lambda configuration
 Each lambda function should have its own directory containing a `config.yml` and `Pipfile`.
