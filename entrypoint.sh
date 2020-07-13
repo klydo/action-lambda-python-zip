@@ -31,7 +31,7 @@ install_zip_dependencies(){
     mkdir python
     pipenv lock --requirements >> requirements.txt
     pip install --target=python -qr requirements.txt
-    if [ "${INPUT_EXCLUDE_BOTOCORE}" == "true" ]; then
+    if [ "${settings_exclude_botocore}" == "true" ]; then
         rm -rf ./python/botocore*
     fi
     zip -qr dependencies.zip ./python
