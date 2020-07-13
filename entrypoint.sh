@@ -31,7 +31,8 @@ install_zip_dependencies(){
     mkdir python
     pipenv lock --requirements >> requirements.txt
     pip install --target=python -qr requirements.txt
-    if [ "${settings_exclude_botocore}" == "true" ]; then
+    if [[ $settings_exclude_botocore == "Y" || $settings_exclude_botocore == "y" || $settings_exclude_botocore == "yes" || $settings_exclude_botocore == "Yes" ]]
+    then
         rm -rf ./python/botocore*
     fi
     zip -qr dependencies.zip ./python
@@ -85,7 +86,7 @@ create_or_update_function_code(){
 }
 
 update_lambda_configuration() {
-    aws lambda update-function-configuration --function-name $LAMBDA_FUNCTION_NAME --layers ${ALL_LAMBDA_LAYERS} --runtime $settings_runtime --role $settings_role --handler $settings_handler --timeout $settings_timeout --memory-size $settings_memory
+    aws lambda update-function-configuration --function-name $LAMBDA_FUNCTION_NAME --layers ${ALL_LAMBDA_LAYERS} --runtime $settings_runtime --role $settings_role --handler $settings_handler --timeout $settings_timeout --memory-size $settings_memory --vpc-config $settings_vpc_config --fs-config $settings_fs_confiig
 }
 
 configure_aws_credentials(){
