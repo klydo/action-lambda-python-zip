@@ -86,7 +86,7 @@ create_or_update_function_code(){
 }
 
 update_lambda_configuration() {
-    aws lambda update-function-configuration --function-name $LAMBDA_FUNCTION_NAME --layers ${ALL_LAMBDA_LAYERS} --runtime $settings_runtime --role $settings_role --handler $settings_handler --timeout $settings_timeout --memory-size $settings_memory --vpc-config $settings_vpc_config --fs-config $settings_fs_confiig
+    aws lambda update-function-configuration --function-name $LAMBDA_FUNCTION_NAME --layers ${ALL_LAMBDA_LAYERS} --runtime $settings_runtime --role $settings_role --handler $settings_handler --timeout $settings_timeout --memory-size $settings_memory --vpc-config $settings_vpc_config --file-system-configs $settings_fs_config
 }
 
 configure_aws_credentials(){
