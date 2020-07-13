@@ -2,7 +2,7 @@ FROM python:3.8
 
 RUN apt-get update
 RUN apt-get install -y jq zip
-RUN pip install awscli
+RUN pip install awscli pipenv
 
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
