@@ -115,7 +115,7 @@ process_lambda_config(){
     echo "Function: ${LAMBDA_FUNCTION_NAME}"
 
     # add to our output variable
-    OUTPUT_FUNCTIONS="${OUTPUT_FUNCTIONS}%0A${LAMBDA_URL}${LAMBDA_FUNCTION_NAME}"
+    OUTPUT_FUNCTIONS="${OUTPUT_FUNCTIONS} - ${LAMBDA_URL}${LAMBDA_FUNCTION_NAME}%0A"
     
     # temporarily change working dir
     pushd $1
