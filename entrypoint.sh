@@ -102,7 +102,9 @@ generate_function_name(){
     then
         LAMBDA_FUNCTION_NAME="${LAMBDA_FUNCTION_NAME}-${INPUT_LAMBDA_FUNCTION_SUFFIX}"
     fi
-    LAMBDA_FUNCTION_NAME="${LAMBDA_FUNCTION_NAME}-$1"
+    LAMBDA_FUNCTION_NAME="${LAMBDA_FUNCTION_NAME}--$1"
+    # replace underscores with dashes
+    LAMBDA_FUNCTION_NAME=${LAMBDA_FUNCTION_NAME//_/-}
 }
 
 process_lambda_config(){
