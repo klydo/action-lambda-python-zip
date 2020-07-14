@@ -115,7 +115,7 @@ process_lambda_config(){
     echo "Function: ${LAMBDA_FUNCTION_NAME}"
 
     # add to our output variable
-    OUTPUT_FUNCTIONS="${OUTPUT_FUNCTIONS}%0A• ${LAMBDA_URL}${LAMBDA_FUNCTION_NAME}"
+    OUTPUT_FUNCTIONS="${OUTPUT_FUNCTIONS}%0A${LAMBDA_URL}${LAMBDA_FUNCTION_NAME}"
     
     # temporarily change working dir
     pushd $1
@@ -168,6 +168,7 @@ deploy_lambda_function(){
     zip_code
     process_function_configs
     clean_up
+    echo $OUTPUT_FUNCTIONS
     echo "::set-output name=all_functions::$OUTPUT_FUNCTIONS"
 }
 
