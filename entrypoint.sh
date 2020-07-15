@@ -1,6 +1,7 @@
 #!/bin/bash
 LAMBDA_URL="https://${INPUT_LAMBDA_REGION}.console.aws.amazon.com/lambda/home?region=${INPUT_LAMBDA_REGION}#/functions/"
 
+# Taken from https://stackoverflow.com/a/21189044
 parse_yaml(){
    local prefix=$2
    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
@@ -17,6 +18,9 @@ parse_yaml(){
       }
    }'
 }
+
+# Taken from https://stackoverflow.com/a/17841619
+function join_by { local IFS="$1"; shift; echo "$*"; }
 
 does_lambda_exist() {
   aws lambda get-function --function-name $1 > /dev/null 2>&1
@@ -66,7 +70,7 @@ publish_dependencies_as_layer(){
     echo "LAYER_NAME: $LAYER_NAME"
     local result=$(aws lambda publish-layer-version --layer-name "${LAYER_NAME}" --zip-file fileb://${FILE_NAME})
     LAYER_VERSION_ARN=$(jq -r '.LayerVersionArn' <<< "$result")
-    ALL_LAMBDA_LAYERS="${ALL_LAMBDA_LAYERS} ${LAYER_VERSION_ARN}"
+    ALL_LAMBDA_LAYERS+=" ${LAYER_VERSION_ARN}"
     echo $ALL_LAMBDA_LAYERS
     rm ${FILE_NAME}
 }
@@ -87,7 +91,18 @@ create_or_update_function_code(){
 }
 
 update_lambda_configuration() {
-    aws lambda update-function-configuration --function-name $LAMBDA_FUNCTION_NAME --layers ${ALL_LAMBDA_LAYERS} --runtime $settings_runtime --role $settings_role --handler $settings_handler --timeout $settings_timeout --memory-size $settings_memory --vpc-config $settings_vpc_config --file-system-configs $settings_fs_config
+    ENV_VARS_VAL="Variables={$(join_by , ${settings_env_vars[@]})}"
+    
+    aws lambda update-function-configuration --function-name $LAMBDA_FUNCTION_NAME \
+        --layers ${ALL_LAMBDA_LAYERS} \
+        --runtime $settings_runtime \
+        --role $settings_role \
+        --handler $settings_handler \
+        --timeout $settings_timeout \
+        --memory-size $settings_memory \
+        --vpc-config $settings_vpc_config \
+        --file-system-configs $settings_fs_config \
+        --environment $ENV_VARS_VAL
 }
 
 configure_aws_credentials(){
@@ -100,9 +115,9 @@ generate_function_name(){
     LAMBDA_FUNCTION_NAME="${INPUT_LAMBDA_FUNCTION_PREFIX}"
     if [ ! -z "$INPUT_LAMBDA_FUNCTION_SUFFIX" ]
     then
-        LAMBDA_FUNCTION_NAME="${LAMBDA_FUNCTION_NAME}-${INPUT_LAMBDA_FUNCTION_SUFFIX}"
+        LAMBDA_FUNCTION_NAME+="-${INPUT_LAMBDA_FUNCTION_SUFFIX}"
     fi
-    LAMBDA_FUNCTION_NAME="${LAMBDA_FUNCTION_NAME}--$1"
+    LAMBDA_FUNCTION_NAME+="--$1"
     # replace underscores with dashes
     LAMBDA_FUNCTION_NAME=${LAMBDA_FUNCTION_NAME//_/-}
 }
@@ -110,14 +125,19 @@ generate_function_name(){
 process_lambda_config(){
     echo ""
     echo "Parsing $1config.yml"
-    eval $(parse_yaml $1config.yml)
+    eval $(parse_yaml $1config.yml settings_)
 
-    # echo $entrypoint
-    generate_function_name $entrypoint
+    generate_function_name $settings_env_vars_ENTRYPOINT
     echo "Function: ${LAMBDA_FUNCTION_NAME}"
 
+    # parse env vars
+    settings_env_vars=()
+    for var in "${!settings_env_vars_@}"; do
+        settings_env_vars+=("${var#"$prefix"}=${!var}")
+    done
+
     # add to our output variable
-    OUTPUT_FUNCTIONS="${OUTPUT_FUNCTIONS} - ${LAMBDA_URL}${LAMBDA_FUNCTION_NAME}%0A"
+    OUTPUT_FUNCTIONS+=" - ${LAMBDA_URL}${LAMBDA_FUNCTION_NAME}%0A"
     
     # temporarily change working dir
     pushd $1
