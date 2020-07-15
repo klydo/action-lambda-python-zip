@@ -133,7 +133,7 @@ process_lambda_config(){
     # parse env vars
     settings_env_vars=()
     for var in "${!settings_env_vars_@}"; do
-        settings_env_vars+=("${var#"$prefix"}=${!var}")
+        settings_env_vars+=("${var#"settings_env_vars_"}=${!var}")
     done
 
     # add to our output variable
