@@ -123,44 +123,48 @@ generate_function_name(){
 }
 
 process_lambda_config(){
-    echo ""
-    echo "Parsing $1config.yml"
-    eval $(parse_yaml $1config.yml settings_)
+    # check if config file actually exists
+    if [ -f "$1config.yml" ]; then
+        echo ""
+        echo "Parsing $1config.yml"
 
-    generate_function_name $settings_env_vars_ENTRYPOINT
-    echo "Function: ${LAMBDA_FUNCTION_NAME}"
+        # parse config file with settings_ prefix
+        eval $(parse_yaml $1config.yml settings_)
 
-    # parse env vars
-    settings_env_vars=()
-    for var in "${!settings_env_vars_@}"; do
-        settings_env_vars+=("${var#"settings_env_vars_"}=${!var}")
-    done
+        generate_function_name $settings_env_vars_ENTRYPOINT
+        echo "Function: ${LAMBDA_FUNCTION_NAME}"
 
-    # add to our output variable
-    OUTPUT_FUNCTIONS+=" - ${LAMBDA_URL}${LAMBDA_FUNCTION_NAME}%0A"
-    
-    # temporarily change working dir
-    pushd $1
+        # parse env vars
+        settings_env_vars=()
+        for var in "${!settings_env_vars_@}"; do
+            settings_env_vars+=("${var#"settings_env_vars_"}=${!var}")
+        done
 
-    # generate requirements.txt from Pipfile
-    # pip install to ./python dir
-    # zip dependencies
-    # split into 50mb archives
-    install_zip_dependencies
+        # add to our output variable
+        OUTPUT_FUNCTIONS+=" - ${LAMBDA_URL}${LAMBDA_FUNCTION_NAME}%0A"
+        
+        # temporarily change working dir
+        pushd $1
 
-    # loop through all split archives
-    # and push as layers
-    process_dependencies
+        # generate requirements.txt from Pipfile
+        # pip install to ./python dir
+        # zip dependencies
+        # split into 50mb archives
+        install_zip_dependencies
 
-    # reset working directory
-    popd
+        # loop through all split archives
+        # and push as layers
+        process_dependencies
 
-    # create or update function code
-    create_or_update_function_code
+        # reset working directory
+        popd
 
-    # update lambda config with new layers and settings from config.yml
-    update_lambda_configuration
+        # create or update function code
+        create_or_update_function_code
 
+        # update lambda config with new layers and settings from config.yml
+        update_lambda_configuration
+    fi
 }
 
 process_function_configs(){
