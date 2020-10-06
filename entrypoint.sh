@@ -34,6 +34,9 @@ does_lambda_exist() {
 install_zip_dependencies(){
     echo "${LAMBDA_FUNCTION_NAME} Installing and zipping dependencies..."
     mkdir python
+    # update lock file
+    pipenv lock
+    # export lock file to requirements.txt
     pipenv lock --requirements >> requirements.txt
     pip install --target=python -qr requirements.txt
     if [[ $settings_exclude_botocore == "Y" || $settings_exclude_botocore == "y" || $settings_exclude_botocore == "yes" || $settings_exclude_botocore == "Yes" ]]
